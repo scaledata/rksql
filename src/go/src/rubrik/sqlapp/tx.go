@@ -389,8 +389,12 @@ func pqConnectionError(ctx context.Context, e pq.Error) bool {
 			// this as a connection error for purposes of retry.
 			return true
 		}
+		return false
+	case "58":
+		//System Error (external or internal to cockroach)
+		return true
 	case "XX":
-		// Internal Error
+		//Internal Error
 		return true
 	// Currently no retries on these, raise an issue if you see any of these.
 	case "01":
@@ -469,19 +473,16 @@ func pqConnectionError(ctx context.Context, e pq.Error) bool {
 		//Savepoint Exception
 		return false
 	case "40":
-		// Transaction rollback.
+		//Transaction rollback.
 		return false
 	case "42":
-		// Syntax Error or Access rule violation
+		//Syntax Error or Access rule violation
 		return false
 	case "53":
 		//Insufficient resources(low_mem, disk_full, too_many_connections)
 		return false
 	case "55":
 		//Object not in prerequisite state
-		return false
-	case "58":
-		//System Error(External to postgres)
 		return false
 	default:
 		return false
